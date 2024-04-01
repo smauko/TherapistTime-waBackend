@@ -10,5 +10,5 @@ try {
 } catch (e) {
 	console.log("nes je krivo, nisi se mogao povezati", e);
 }
-let db = conn.db("testDB");
+let db = conn.db("TherapistTimeDB");
 export default db;
