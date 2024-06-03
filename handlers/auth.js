@@ -42,31 +42,28 @@ export default{
             return {
                 token,
                 email: user.Email, 
+                uloga: user.Uloga,
             };
         } else {
             throw new Error('Greška prilikom login-a');
         }
     },
-    verify(req, res, next){
-        if (req.headers['authorization']) {
-        let authorization = req.headers.authorization.split(" ");
-        let type = authorization[0];
-        let token = authorization[1];
+    verifyMyWay(token){
+        if (!token) {
+            console.error('Token nije proslijeđen');
+            return res.status(400).send("Token je obavezan");
+        }
+    
         try {
-        if(type !== 'Bearer'){
-            console.log('uso sam u try/if')
-            res.status(401).send();
-            return res.status(401).send();
+            let podaci = jwt.verify(token, process.env.JWT_SECRET);
+            console.log(podaci);
+            // Provjera isteka tokena
+        if (Date.now() >= podaci.exp * 1000) {
+            throw new Error('Token je istekao');
         }
-        else {
-            req.jwt = jwt.verify(token, process.env.JWT_SECRET);
-            return next();
-        }}catch (err) {
-            return res.status(401).send(); // HTTP not-authorized
+            return podaci.Email;
+        } catch (e) {
+            return res.status(401).send("Nevaljali token");
         }
-    } else {
-        return res.status(401).send(); // HTTP invalid request
-    }
-
     }
 }

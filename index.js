@@ -14,8 +14,16 @@ app.use(cors());
 app.use(express.json());
 app.use("/", router);
 
-router.route('/verify').get(auth.verify, (req,res)=>{
-    res.status(200).send('Potvrđen token korisnika: ' + req.jwt.Email);
+router.route('/verify').post((req,res)=>{
+    console.log(req.body); // Log the query parameters
+    let token = req.body.token; 
+    console.log(token, 'iz route');
+    try{
+    let result = auth.verifyMyWay(token);
+    res.status(200).send('Potvrđen token korisnika: ' + result);}
+    catch(e){
+        res.status(500).send("Token nije valjan ili je istekao!");
+    }
 })
 
 router.route('/signup').post(async (req, res) => {
