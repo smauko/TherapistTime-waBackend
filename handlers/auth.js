@@ -40,6 +40,7 @@ export default{
                 expiresIn: '1 week',
             });
             return {
+                id: user._id,
                 token,
                 email: user.Email, 
                 uloga: user.Uloga,
@@ -56,7 +57,7 @@ export default{
     
         try {
             let podaci = jwt.verify(token, process.env.JWT_SECRET);
-            console.log(podaci);
+            //console.log(podaci);
             // Provjera isteka tokena
         if (Date.now() >= podaci.exp * 1000) {
             throw new Error('Token je istekao');
