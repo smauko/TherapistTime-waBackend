@@ -68,7 +68,7 @@ router.route('/zakazitermin').post(async (req, res) => {
         res.status(500).send("Termin već postoji ili je greška sa podacima!");
     }
 });
-router.route('/zakazanitermin/doktori').get(async (req, res) => {
+router.route('/zakazitermin/doktori').get(async (req, res) => {
     try{
     let result = await uloga.sviDoktori();
     res.status(201).send(result);}
@@ -76,10 +76,10 @@ router.route('/zakazanitermin/doktori').get(async (req, res) => {
         res.status(500).send("Nešto nije u redu sa bazom.");
     }   
 });
-router.route('/zakazanitermin/dostupnitermini').get(async (req, res) => {
+router.route('/zakazitermin/dostupnitermini').get(async (req, res) => {
     const param1 = req.query.param1;
     const param2 = req.query.param2;
-    //console.log(param1,param2);
+    console.log(param1,param2);
     try{
     let result = await termin.dostupniTermini(param1, param2);
     console.log(result);
@@ -89,6 +89,16 @@ router.route('/zakazanitermin/dostupnitermini').get(async (req, res) => {
     }
 });
 
+router.route('/zakazanitermini').get(async (req, res) => {
+    let param3 = req.query.param3;
+    console.log(param3);
+    try{
+    let result = await termin.dohvatiTermine(param3);
+    res.status(201).send(result);}
+    catch(e){
+        res.status(500).send("Nešto nije u redu sa bazom.");
+    }   
+});
 
 app.listen(port, () => {
     console.log(`Service radi na portu ${port}`);

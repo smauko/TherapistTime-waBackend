@@ -15,14 +15,14 @@ export default{
         let termini = await db.collection('termini').find( {doktor: doktor_email, status: "neodrađen", datum: datum_termina } ).toArray();
 
         let nedostupniTermini = termini.map(termin =>termin.vrijeme
-);
+);      console.log(nedostupniTermini);
 
         let dostupniTermini = slobodniTermini.filter(termin => !nedostupniTermini.includes(termin));
-        // console.log(dostupniTermini);
+        console.log(dostupniTermini);
         return dostupniTermini;
             
         } catch (error) {
-            //console.log("u catch sam");
+            console.log("u catch sam");
             throw new Error("Termin već postoji ili je neka greska sa podacima");
         }
 
@@ -51,4 +51,21 @@ export default{
             
         }
     },
+    async dohvatiTermine(pacijentEmail){
+        try {
+        let termini = await db.collection('termini').find( {pacijent: pacijentEmail} ).toArray();
+        let result = termini.map(termin => ({
+            idTermina: termin._id,
+            vrstaEpizode: termin.vrstaEpizode,
+            datumTermina: termin.datum,
+            vrijemeTermina: termin.vrijeme,
+            status: termin.status
+        }));
+        return result;
+
+        } catch (error) {
+            
+        }
+
+    }
 }
