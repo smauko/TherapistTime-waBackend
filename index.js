@@ -157,7 +157,37 @@ router.route('/avgocijene').get(async (req, res) => {
         res.status(500).send("Nešto nije u redu sa bazom.");
     }   
 });
-
+router.route('/zakazaniterminidoktor').get(async (req, res) => {
+    let param11 = req.query.param11;
+    console.log(param11);
+    try{
+    let result = await termin.dohvatiTermineDoktor(param11);
+    res.status(201).send(result);}
+    catch(e){
+        res.status(500).send("Nešto nije u redu sa bazom.");
+    }   
+});
+router.route('/prikazterminadoktor').get(async (req, res) => {
+    let param12 = req.query.param12;
+    console.log(param12);
+    try{
+    let result = await termin.dohvatiTerminDoktor(param12);
+    res.status(201).send(result);}
+    catch(e){
+        res.status(500).send("Nešto nije u redu sa bazom.");
+    }   
+});
+router.route('/dodajsazetak').post(async (req, res) => {
+    let param13 = req.body.id;
+    let param14 = req.body.sazetak;
+    console.log(param13, param14);
+    try{
+    let result = await termin.dodajSazetakTermina(param13, param14);
+    res.status(201).send(result);}
+    catch(e){
+        res.status(500).send("Nešto nije u redu sa bazom.");
+    }   
+});
 
 app.listen(port, () => {
     console.log(`Service radi na portu ${port}`);

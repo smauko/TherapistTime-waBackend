@@ -17,10 +17,10 @@ export default{
         let termini = await db.collection('termini').find( {doktor: doktor_email, status: "neodrađen", datum: datum_termina } ).toArray();
 
         let nedostupniTermini = termini.map(termin =>termin.vrijeme
-);      console.log(nedostupniTermini);
+);      //console.log(nedostupniTermini);
 
         let dostupniTermini = slobodniTermini.filter(termin => !nedostupniTermini.includes(termin));
-        console.log(dostupniTermini);
+        //console.log(dostupniTermini);
         return dostupniTermini;
             
         } catch (error) {
@@ -38,7 +38,8 @@ export default{
             pacijent:terminData.pacijent,
             doktor:terminData.doktor,
             status: terminData.status,
-            zoom: terminData.zoom
+            zoom: terminData.zoom,
+            sazetak_termina: ""
         
         };
         
@@ -80,7 +81,8 @@ export default{
                   
                 if (!existingOcijena) {
                     let dodajocijenu = await db.collection("ocijene").insertOne(ocijena);
-                console.log(ocijena);   }   
+                //console.log(ocijena);   
+            }   
                 
                 await db.collection('termini').updateOne({ _id: objectId }, { $set: { status: 'odrađen' } });
                 termin.status = 'odrađen'; 
@@ -105,12 +107,12 @@ export default{
             const objectId = new mongo.ObjectId(idTermina);
             try {
             let termin1 = await db.collection('termini').findOne({_id: objectId});
-            console.log("pronasao sam podatke o terminu", termin1.doktor);
+            //console.log("pronasao sam podatke o terminu", termin1.doktor);
             let doktorEmail = termin1.doktor;
             let doktorData = await db.collection('users').findOne({ Email: doktorEmail }, { projection: { _id: 0,  Ime: 1, Prezime: 1, DatumRodenja: 1 } });
-            console.log("imam podatke o doktoru", doktorData);
+            //console.log("imam podatke o doktoru", doktorData);
             let result = {...termin1, ...doktorData};
-            console.log(result);
+            //console.log(result);
             return result;
     
             } catch (error) {
@@ -140,6 +142,69 @@ export default{
     let month = (date.getMonth() + 1).toString().padStart(2, '0'); 
     let year = date.getFullYear();
     return `${day}.${month}.${year}`;
+},
+async dohvatiTermineDoktor(doktorEmail){
+    try {
+    //console.log(doktorEmail);
+    let termini = await db.collection('termini').find( {doktor: doktorEmail} ).sort({ datum: -1 }).toArray();
+    //console.log(termini);
+    let now = new Date();
+    let ternutacno = this.formatDate(now);
+    //console.log("now", ternutacno);
+
+    for (let termin of termini) {
+        //console.log("terminDate", termin.datum);
+        if (termin.datum < ternutacno && termin.status !== 'odrađen') {
+            let objectId = new mongo.ObjectId(termin._id);
+            //console.log(objectId);
+            await db.collection('termini').updateOne({ _id: objectId }, { $set: { status: 'odrađen' } });
+            termin.status = 'odrađen'; 
+        }
+    }
+
+
+    let result = termini.map(termin => ({
+        idTermina: termin._id,
+        vrstaEpizode: termin.vrstaEpizode,
+        datumTermina: termin.datum,
+        vrijemeTermina: termin.vrijeme,
+        status: termin.status
+    }));
+    //console.log(result);
+    return result;
+
+    } catch (error) {
+        throw new Error("Nešto nije uredu sa bazom.");
+    };
+},
+async dohvatiTerminDoktor(idTermina){
+    const objectId = new mongo.ObjectId(idTermina);
+    try {
+    let termin1 = await db.collection('termini').findOne({_id: objectId});
+    //console.log("pronasao sam podatke o terminu", termin1.doktor);
+    let pacijentEmail = termin1.pacijent;
+    let pacijentData = await db.collection('users').findOne({ Email: pacijentEmail }, { projection: { _id: 0,  Ime: 1, Prezime: 1, DatumRodenja: 1 } });
+    //console.log("imam podatke o doktoru", doktorData);
+    let result = {...termin1, ...pacijentData};
+    //console.log(result);
+    return result;
+
+    } catch (error) {
+        throw new Error("Nešto nije uredu sa bazom.");
+
+    };
+
+},
+async dodajSazetakTermina(idTermina, sazetak){
+    try {
+    const objectId = new mongo.ObjectId(idTermina);
+    let result = await db.collection('termini').updateOne({ _id: objectId }, { $set: { sazetak_termina: sazetak } });
+    return result;
+    } catch (error) {
+        throw new Error("Nešto nije uredu sa bazom.");
+    }
+    
+
 },
 
     

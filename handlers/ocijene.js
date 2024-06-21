@@ -44,7 +44,7 @@ export default{
                 }
               }
             ]).next();
-            console.log(avgOcijenas);
+            //console.log(avgOcijenas);
             return avgOcijenas;
           } catch (error) {
             console.error("Error calculating average ocijena per doktor:", error);
