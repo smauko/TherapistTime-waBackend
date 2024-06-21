@@ -20,6 +20,7 @@ export default{
         let result= await db.collection("users").insertOne(doc);
         if (result && result.insertedId) {
             console.log(result, result.insertedId);
+            
             return result.insertedId;
         }   
     }

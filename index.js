@@ -5,6 +5,7 @@ import cors from 'cors';
 import auth from "./handlers/auth.js";
 import termin from "./handlers/termin.js"
 import uloga from "./handlers/uloga.js";
+import ocijene from "./handlers/ocijene.js";
 dotenv.config();
 
 const app = express();
@@ -31,6 +32,7 @@ router.route('/verify').post((req,res)=>{
 router.route('/signup').post(async (req, res) => {
     let user = req.body;
     let email = req.body.email;
+    console.log(user, email);   
     try{
     let result = await auth.registerUser(user);
     res.status(201).send("Korisnik uspješno kreiran sa mailom: " + email + ",id:(" + result +")");}
@@ -99,6 +101,63 @@ router.route('/zakazanitermini').get(async (req, res) => {
         res.status(500).send("Nešto nije u redu sa bazom.");
     }   
 });
+
+router.route('/prikaztermina').get(async (req, res) => {
+    let param4 = req.query.param4;
+    console.log(param4);
+    try{
+    let result = await termin.dohvatiTermin(param4);
+    res.status(201).send(result);}
+    catch(e){
+        res.status(500).send("Nešto nije u redu sa bazom.");
+    }   
+});
+
+router.route('/izbrisitermin').delete(async (req, res) => {
+    let param5 = req.query.param5;
+    console.log("parametar",param5);
+    try{
+    let result = await termin.izbrisiTermin(param5);
+    res.status(201).send(result);}
+    catch(e){
+        res.status(500).send("Nešto nije u redu sa bazom.");
+    }   
+});
+
+router.route('/odradenidoktori').get(async (req, res) => {
+    let param6 = req.query.param6;
+    console.log(param6);
+    try{
+    let result = await uloga.prikazOredenihDoktora(param6);
+    res.status(201).send(result);}
+    catch(e){
+        res.status(500).send("Nešto nije u redu sa bazom.");
+    }   
+});
+
+router.route('/ocijenidoktora').post(async (req, res) => {
+    let param7 = req.body.param7;
+    let param8 = req.body.param8;
+    let param9 = req.body.param9;
+    console.log(param7, param8,param9);
+    try{
+    let result = await ocijene.ocijeniDoktora(param7, param8,param9);
+    res.status(201).send(result);}
+    catch(e){
+        res.status(500).send("Nešto nije u redu sa bazom.");
+    }   
+});
+
+router.route('/avgocijene').get(async (req, res) => {
+    let param10= req.query.param10;
+    try{
+    let result = await ocijene.avgOcijena(param10);
+    res.status(201).send(result);}
+    catch(e){
+        res.status(500).send("Nešto nije u redu sa bazom.");
+    }   
+});
+
 
 app.listen(port, () => {
     console.log(`Service radi na portu ${port}`);

@@ -24,6 +24,25 @@ export default{
                 throw new Error("Nešto nije u redu sa bazom");
                 
             }
+
         
-    }
-}
+    },
+    async prikazOredenihDoktora(pacijentEmail){
+        try {
+        let doktorData = [];
+        let doktor = await db.collection('termini').find({pacijent: pacijentEmail, status: 'odrađen'}, { projection: {_id:0, doktor: 1 }}).toArray();
+        let uniqueDoktor = [...new Set(doktor.map(item => item.doktor))];
+        console.log("Ovo je rezultat", uniqueDoktor);
+        for (const doktor of uniqueDoktor) {
+            console.log(doktor);
+            let data = await db.collection('users').findOne({ Email: doktor }, { projection: { _id: 0, Ime: 1, Prezime: 1, Email: 1 } });
+            doktorData.push(data);
+        }
+        return doktorData;
+
+        } catch (error) {
+            console.log("u catch sam");
+            throw new Error("Nešto nije uredu sa bazom.");
+
+        }
+}}
